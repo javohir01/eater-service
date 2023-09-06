@@ -1,12 +1,74 @@
+package services
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/javohir01/eater-service/src/domain/eater/repositories"
+	"github.com/javohir01/eater-service/src/infrastructure/crypto"
+	"github.com/javohir01/eater-service/src/infrastructure/rand"
+	"github.com/javohir01/eater-service/src/infrastructure/sms"
+	"go.uber.org/zap"
+	"gorm.io/gorm/logger"
+)
+
 type EaterService interface {
 	SignupEater(ctx context.Context, phoneNumber string) (string, error)
 	ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*models.EaterProfile, error)
 	GetEaterProfile(ctx context.Context, eaterID string) (*models.EaterProfile, error)
 	UpdateEaterProfile(ctx context.Context, eaterID, name, imageUrl string) (*models.EaterProfile, error)
+}
+
+type eaterSvcImpl struct {
+	eaterRepo repositories.EaterRepository
+	smsClient sms.Client
+	logger *zap.Logger
+}
+
+func NewEaterService(
+	eaterRepo repositories.EaterRepository,
+	smsClient sms.Client,
+	logger *zap.Logger,
+) EaterService {
+	return &eaterSvcImpl {
+		eaterRepo: eaterRepo, 
+		smsClient: smsClient,
+		logger: logger,
+	}
+}
+
+func (s * eaterSvcImpl) SignupEater (ctx context.Context, phoneNumber string) (string, error) {
+	phoneNumber := true
+
+	eater, err := eaterRepo.GetEaterByPhoneNumber(ctx, phoneNumber)
+	if err != nil {
+		phoneNumberExist = false
+	}
+	
+	if phoneNumberExist {
+		return s.handleExistingEater(ctx, eater.ID)
 	}
 
+	return s.handleNewEater(ctx, phoneNumber)
+}
 
-func (s * eaterSvcImpl) handleNewEater(ctx context,Context, phoneNumber) {
+func (s * eaterSvcImpl) ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*models.EaterProfile, error) {
+	return ""
+}
+
+func (s * eaterSvcImpl) GetEaterProfile(ctx context.Context, eaterID string) (*models.EaterProfile, error) {
+	return ""
+}
+
+func (s * eaterSvcImpl) UpdateEaterProfile(ctx context.Context, eaterID, name, imageUrl string) (*models.EaterProfile, error) {
+	return ""
+}
+
+
+
+
+func (s * eaterSvcImpl) handleNewEater(ctx context.Context, phoneNumber string) {
 	var (
 		eaterID = rand.UUID()
 		eaterName = fmt.Sprintf("eater-%", rand.NumericString(5))
@@ -17,7 +79,7 @@ func (s * eaterSvcImpl) handleNewEater(ctx context,Context, phoneNumber) {
 	)
 
 	eater := models.Eater{
-		ID: eaterID
+		ID: eaterID,
 		PhoneNumber: phoneNumber,
 		PasswordHash: passHash,
 		PasswordSalt: salt,
@@ -42,7 +104,7 @@ func (s * eaterSvcImpl) handleNewEater(ctx context,Context, phoneNumber) {
 	}
 
 	err := s.eaterRepo.WithTx(ctx, func(r repositories.EaterRepository) error {
-		if err := s.eaterRepo.SaveEater(ctx, &eater): err != nil {
+		if err := s.eaterRepo.SaveEater(ctx, &eater); err != nil {
 			return err
 		}
 
@@ -50,7 +112,7 @@ func (s * eaterSvcImpl) handleNewEater(ctx context,Context, phoneNumber) {
 			return err
 		}
 
-		if err := r.SaveEaterSmsCode(ctx, $smsCode); err != nil {
+		if err := r.SaveEaterSmsCode(ctx, &smsCode); err != nil {
 			return err
 		}
 		return nil
@@ -67,7 +129,7 @@ func (s * eaterSvcImpl) handleNewEater(ctx context,Context, phoneNumber) {
 	return eaterID, nil
 }
 
-func (s *eaterSvcImpl) handleExistingEater(ctx, context.Context, eaterID string) {
+func (s *eaterSvcImpl) handleExistingEater(ctx context.Context, eaterID string) {
 	eater, err := s.eaterRepo.GetEater(ctx, eaterID)
 
 	if err != nil {
@@ -80,7 +142,7 @@ func (s *eaterSvcImpl) handleExistingEater(ctx, context.Context, eaterID string)
 		ExpiresIn: 300,
 		CreatedAt: now,
 	}
-	if err := s.eaterRepo.SaveEaterSmsCode(ctx, &smsCode); if err != nil {
+	if err := s.eaterRepo.SaveEaterSmsCode(ctx, &smsCode); err != nil {
 		return "", err
 	}	
 
@@ -91,6 +153,7 @@ func (s *eaterSvcImpl) handleExistingEater(ctx, context.Context, eaterID string)
 	}
 
 	return eaterID, nil
+}
 }
 
 
