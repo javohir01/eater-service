@@ -1,11 +1,13 @@
-packege dtos
+package dtos
 
-typeEaterSignupResponse struct {
-	EaterID string `json: "eater_id"`
+import "github.com/javohir01/eater-service/src/domain/eater/models"
+
+type UpdateEaterProfileResponse struct {
+	Profile *models.EaterProfile `json:"profile"`
 }
 
-func NewEaterSignupResponse (eaterID string ) * EaterSignupResponse {
-	return&EaterSignupResponse{
-		EaterID: eaterID
+func NewUpdateEaterProfileResponse(profile *models.EaterProfile) *UpdateEaterProfileResponse {
+	return &UpdateEaterProfileResponse{
+		Profile: profile,
 	}
 }

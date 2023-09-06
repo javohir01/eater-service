@@ -1,6 +1,10 @@
 package services
 
-import "context"
+import (
+	"context"
+
+	"github.com/javohir01/eater-service/src/application/dtos"
+)
 
 type EaterApplicationService interface {
 	SignupEater(ctx context.Context, phoneNumber string) (*dtos.EaterSignupResponse, error)
