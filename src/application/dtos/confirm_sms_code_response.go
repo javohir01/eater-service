@@ -2,14 +2,15 @@ package dtos
 
 import "github.com/javohir01/eater-service/src/domain/eater/models"
 
-type ComfirmSMSCodeResponse struct {
+type ConfirmSMSCodeResponse struct {
 	Token   string               `json:"token"`
 	Profile *models.EaterProfile `json:"profile"`
 }
 
-func NewComfirmSMSCodeResponse(token string, profile *models.EaterProfile) *ComfirmSMSCodeResponse {
-	return &ComfirmSMSCodeResponse{
+func NewComfirmSMSCodeResponse(token string, profile *models.EaterProfile) *ConfirmSMSCodeResponse {
+	return &ConfirmSMSCodeResponse{
 		Profile: profile,
 		Token:   token,
 	}
 }
+ 
