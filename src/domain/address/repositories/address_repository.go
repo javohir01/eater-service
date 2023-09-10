@@ -7,9 +7,10 @@ import (
 )
 
 type AddressRepository interface {
-	CreateAdress(ctx context.Context, adress *models.Address) error
-	UpdateAdress(ctx context.Context, adress *models.Address) error
-	DeleteAddress(ctx context.Context, id string) (*models.Address, error)
+	WithTx(ctx context.Context, f func(r AddressRepository) error) error
+	CreateAddress(ctx context.Context, address *models.Address) error
+	UpdateAddress(ctx context.Context, address *models.Address) error
+	DeleteAddress(ctx context.Context, id string) error
 	GetAddressById(ctx context.Context, id string) (*models.Address, error)
-	ListAddressByEaterId(ctx context.Context, eaterID string) (*models.Address, error)
+	ListAddressByEaterId(ctx context.Context, eaterID string) ([]*models.Address, error)
 }
