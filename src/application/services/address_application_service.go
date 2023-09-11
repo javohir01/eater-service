@@ -21,7 +21,7 @@ type addressAppSvcImpl struct {
 }
 
 func NewAddressApplicationService(
-	addressSvc addressSvc,
+	addressSvc addressSvc.AddressService,
 ) AddressApplicationService {
 	return &addressAppSvcImpl{
 		addressSvc: addressSvc,
@@ -109,7 +109,8 @@ func (s *addressAppSvcImpl) GetAddressById(ctx context.Context, addressID string
 		return nil, err
 	}
 
-	return dtos.SaveAddressResponse(result), nil
+	response := dtos.SaveAddressResponse(result)
+	return &response, nil
 }
 
 func (s *addressAppSvcImpl) ListAddressByEaterId(ctx context.Context, eaterID string) ([]*dtos.ListAddressByEaterIdResponse, error) {
