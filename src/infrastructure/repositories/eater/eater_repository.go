@@ -53,7 +53,7 @@ func (r *eaterRepoImpl) UpdateEater(ctx context.Context, eater *models.Eater) er
 }
 func (r *eaterRepoImpl) DeleteEater(ctx context.Context, eaterID string) error {
 	var eater models.Eater
-	result := r.db.WithContext(ctx).Table(tableEaters).Delete(&eater, "id = ?", eaterID)
+	result := r.db.WithContext(ctx).Table(tableEaters).Delete(&eater, "eater_id = ?", eaterID)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -61,7 +61,7 @@ func (r *eaterRepoImpl) DeleteEater(ctx context.Context, eaterID string) error {
 }
 func (r *eaterRepoImpl) GetEater(ctx context.Context, eaterID string) (*models.Eater, error) {
 	var eater models.Eater
-	result := r.db.WithContext(ctx).Table(tableEaters).First(&eater, "id = ?", eaterID)
+	result := r.db.WithContext(ctx).Table(tableEaters).First(&eater, "eater_id = ?", eaterID)
 	if result.Error != nil {
 		return nil, result.Error
 	}

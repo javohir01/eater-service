@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	tableOrder = "order.order"
-	tableCart  = "order.cart"
+	tableOrder = "eater.order"
+	tableCart  = "eater.cart"
 )
 
 type orderRepoImpl struct {

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	tableRestaurantRating = "rating.restaurant_rating"
+	tableRestaurantRating = "eater.restaurant_rating"
 	tableDeliveryRating   = "rating.delivery_rating"
 )
 
