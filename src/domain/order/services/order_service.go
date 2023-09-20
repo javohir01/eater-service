@@ -9,13 +9,7 @@ import (
 )
 
 type OrderService interface {
-	CreateAddress(
-		ctx context.Context,
-		Instruction,
-		EaterID,
-		RestaurantID,
-		Status,
-		PaymentStatus,
+	CreateAddress(ctx context.Context, EaterID, string, Status, PaymentStatus,
 		OrderItemID,
 		ProductID,
 		Name string,
@@ -68,7 +62,7 @@ func (s *orderSvcImpl) CreateOrder(
 	Price,
 	TotalPrice int,
 ) (*models.Order, error) {
-	orderItem[] := models.OrderItem{
+	orderItem := models.OrderItem{
 		ID:         OrderItemID,
 		ProductID:  ProductID,
 		Name:       Name,
@@ -82,7 +76,7 @@ func (s *orderSvcImpl) CreateOrder(
 		EaterID:       EaterID,
 		Instruction:   Instruction,
 		RestaurantID:  RestaurantID,
-		Items:         orderItem,
+		Items:         []*orderItem,
 		Status:        Status,
 		PaymentStatus: PaymentStatus,
 		CreatedAt:     time.Now().UTC(),

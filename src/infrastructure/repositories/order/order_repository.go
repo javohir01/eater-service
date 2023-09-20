@@ -5,12 +5,14 @@ import (
 
 	"github.com/javohir01/eater-service/src/domain/order/models"
 	"github.com/javohir01/eater-service/src/domain/order/repositories"
+	"github.com/javohir01/eater-service/src/infrastructure/utils"
 	"gorm.io/gorm"
 )
 
 const (
-	tableOrder = "eater.order"
-	tableCart  = "eater.cart"
+	tableOrder      = "eater.order"
+	tableCart       = "eater.cart"
+	tableOrderItems = "eater.order_items"
 )
 
 type orderRepoImpl struct {
@@ -38,8 +40,16 @@ func (r *orderRepoImpl) WithTx(ctx context.Context, f func(r repositories.OrderR
 	return nil
 }
 
-func (r *orderRepoImpl) CreateOrder(ctx context.Context, order *models.Order) error {
+func (r *orderRepoImpl) SaveOrder(ctx context.Context, order *models.Order) error {
 	result := r.db.WithContext(ctx).Table(tableOrder).Create(order)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *orderRepoImpl) SaveOrderItems(ctx context.Context, orderItem []*models.OrderItem) error {
+	result := r.db.WithContext(ctx).Table(tableOrderItems).Create(orderItem)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -54,7 +64,19 @@ func (r *orderRepoImpl) UpdateOrder(ctx context.Context, order *models.Order) er
 	return nil
 }
 
-func (r *orderRepoImpl) GetOrderById(ctx context.Context, order_id string) (*models.Order, error) {
+func (r *orderRepoImpl) UpdateOrderStatus(ctx context.Context, orderID, status string) error {
+	result := r.db.WithContext(ctx).Table(tableOrder).Where("id =?", orderID).Update("status", status)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *orderRepoImpl) UpdateOrderPaymentStatus(ctx context.Context, orderID, status string) error {
+	return r.db.WithContext(ctx).Table(tableOrder).Where("id =?", orderID).Update("payment_status", status).Error
+}
+
+func (r *orderRepoImpl) GetOrder(ctx context.Context, order_id string) (*models.Order, error) {
 	var order models.Order
 	result := r.db.WithContext(ctx).Table(tableOrder).First(&order, "id = ?", order_id)
 	if result.Error != nil {
@@ -63,18 +85,22 @@ func (r *orderRepoImpl) GetOrderById(ctx context.Context, order_id string) (*mod
 	return &order, nil
 }
 
-func (r *orderRepoImpl) ListOrderByEaterId(ctx context.Context, eater_id string) ([]*models.Order, error) {
-	var order []models.Order
-	result := r.db.WithContext(ctx).Table(tableOrder).Where(&order, "eater_id = ?", eater_id)
+func (r *orderRepoImpl) ListOrderByEaterId(ctx context.Context, eater_id, sort string, page, perPage int) ([]*models.Order, error) {
+	var orders []*models.Order
+	result := r.db.WithContext(ctx).
+		Table(tableOrder).
+		Where("eater_id = ?", eater_id).
+		Order(sort).
+		Scopes(utils.Paginate(page, perPage)).
+		Find(orders)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &address, nil
+	return &orders, nil
 }
 
 func (r *orderRepoImpl) DeleteOrder(ctx context.Context, id string) error {
-	var order models.Order
-	result := r.db.WithContext(ctx).Table(tableOrder).Delete(&order, "id = ?", id)
+	result := r.db.WithContext(ctx).Table(tableOrder).Delete("id = ?", id)
 	if result.Error != nil {
 		return result.Error
 	}
