@@ -54,14 +54,15 @@ func (s *eaterSvcImpl) SignupEater(ctx context.Context, phoneNumber string) (str
 	return s.handleNewEater(ctx, phoneNumber)
 }
 
-func (s *eaterSvcImpl) ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*models.EaterProfile, error) {
-	smsCode, err := s.eaterRepo.GetEaterSmsCode(ctx, eaterID, smsCode)
+func (s *eaterSvcImpl) ConfirmSMSCode(ctx context.Context, eaterID, code string) (*models.EaterProfile, error) {
+	smsCode, err := s.eaterRepo.GetEaterSmsCode(ctx, eaterID, code)
 	if err != nil {
 		return nil, err
 	}
-	if smsCode.IsExpired() {
-		return nil, errors.New("code is expired")
+	if smsCode.ID == 0 {
+		return nil, errors.New("code was not found")
 	}
+
 	return nil, nil
 }
 

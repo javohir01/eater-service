@@ -6,7 +6,7 @@ type OrderListResponse struct {
 	Order []*models.Order
 }
 
-func NewOrderListResponse(order *models.Order) *OrderListResponse {
+func NewOrderListResponse(order []*models.Order) *OrderListResponse {
 	return &OrderListResponse{
 		Order: order,
 	}

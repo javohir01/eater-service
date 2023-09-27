@@ -22,7 +22,7 @@ func NewRepository(db *gorm.DB) repositories.WalletRepository {
 	}
 }
 
-func (r *walletRepoImpl) WithTx(ctx context.Context, f func(r repositories.WalletRepository) error) error {
+func (r *walletRepoImpl) WithContext(ctx context.Context, f func(r repositories.WalletRepository) error) error {
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
 		r := walletRepoImpl{
 			db: tx,
@@ -64,10 +64,10 @@ func (r *walletRepoImpl) GetWalletByCardId(ctx context.Context, card_id string) 
 }
 
 func (r *walletRepoImpl) GetWalletsListByEaterId(ctx context.Context, eater_id string) ([]*models.PaymentCard, error) {
-	var wallet models.PaymentCard
-	result := r.db.WithContext(ctx).Table(tableWallet).Where(&wallet,"id = ?", eater_id)
+	var wallet []*models.PaymentCard
+	result := r.db.WithContext(ctx).Table(tableWallet).Where(&wallet, "id = ?", eater_id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return []&wallet, nil
+	return wallet, nil
 }

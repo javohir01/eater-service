@@ -9,7 +9,7 @@ import (
 )
 
 type OrderService interface {
-	CreateAddress(ctx context.Context, EaterID, string, Status, PaymentStatus,
+	CreateOrder(ctx context.Context, EaterID, string, Status, PaymentStatus,
 		OrderItemID,
 		ProductID,
 		Name string,
@@ -17,7 +17,7 @@ type OrderService interface {
 		Price,
 		TotalPrice int,
 	) (*models.Order, error)
-	UpdateAddress(
+	UpdateOrder(
 		ctx context.Context,
 		Instruction,
 		EaterID,
@@ -31,7 +31,7 @@ type OrderService interface {
 		Price,
 		TotalPrice int,
 	) (*models.Order, error)
-	DeleteAddress(ctx context.Context, orderID string) error
+	DeleteOrder(ctx context.Context, orderID string) error
 	GetOrderById(ctx context.Context, orderID string) (*models.Order, error)
 	ListOrderByEaterId(ctx context.Context, eaterID string) ([]*models.Order, error)
 }
@@ -143,7 +143,7 @@ func (s *orderSvcImpl) UpdateOrder(
 }
 
 func (s *orderSvcImpl) DeleteOrder(ctx context.Context, orderID string) error {
-	err := s.addressRepo.WithTx(ctx, func(r repositories.OrderRepository) error {
+	err := s.orderRepo.WithTx(ctx, func(r repositories.OrderRepository) error {
 		if err := r.DeleteOrder(ctx, orderID); err != nil {
 			return err
 		}

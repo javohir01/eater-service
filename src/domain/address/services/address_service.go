@@ -6,12 +6,12 @@ import (
 
 	"github.com/javohir01/eater-service/src/domain/address/models"
 	"github.com/javohir01/eater-service/src/domain/address/repositories"
-	"github.com/javohir01/eater-service/src/infastructure/rand"
+	"github.com/javohir01/eater-service/src/infrastructure/rand"
 )
 
 type AddressService interface {
-	CreateAddress(ctx context.Context, EaterID, name string, Latitude, Longitude float64) (*models.Address, error)
-	UpdateAddress(ctx context.Context, addressID, EaterID, name string, Latitude, Longitude float64) (*models.Address, error)
+	CreateAddress(ctx context.Context, EaterID, Name string, Latitude, Longitude float64) (*models.Address, error)
+	UpdateAddress(ctx context.Context, addressID, EaterID, Name string, Latitude, Longitude float64) (*models.Address, error)
 	DeleteAddress(ctx context.Context, addressID string) error
 	GetAddressById(ctx context.Context, addressID string) (*models.Address, error)
 	ListAddressByEaterId(ctx context.Context, eaterID string) ([]*models.Address, error)
@@ -29,7 +29,7 @@ func NewAddressService(
 	}
 }
 
-func (s *addressSvcImpl) CreateAddress(ctx context.Context, EaterID, name string, Latitude, Longitude float64) (*models.Address, error) {
+func (s *addressSvcImpl) CreateAddress(ctx context.Context, EaterID, Name string, Latitude, Longitude float64) (*models.Address, error) {
 	location := &models.Location{
 		Longitude: Longitude,
 		Latitude:  Latitude,
@@ -38,7 +38,7 @@ func (s *addressSvcImpl) CreateAddress(ctx context.Context, EaterID, name string
 	address := &models.Address{
 		ID:        rand.UUID(),
 		EaterID:   EaterID,
-		Name:      name,
+		Name:      Name,
 		Location:  location,
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),

@@ -5,7 +5,7 @@ import (
 
 	"github.com/javohir01/eater-service/src/domain/order/models"
 	"github.com/javohir01/eater-service/src/domain/order/repositories"
-	"github.com/javohir01/eater-service/src/infrastructure/utils"
+	"github.com/javohir01/eater-service/src/infrastructure/repositories/utils"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +37,7 @@ func (r *orderRepoImpl) WithTx(ctx context.Context, f func(r repositories.OrderR
 	}); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -96,7 +97,7 @@ func (r *orderRepoImpl) ListOrderByEaterId(ctx context.Context, eater_id, sort s
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &orders, nil
+	return orders, nil
 }
 
 func (r *orderRepoImpl) DeleteOrder(ctx context.Context, id string) error {

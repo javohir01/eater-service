@@ -5,196 +5,122 @@ import (
 	"errors"
 
 	dtos "github.com/javohir01/eater-service/src/application/dtos/order"
+	pb "github.com/javohir01/eater-service/src/application/protos/eater"
+	addressSvc "github.com/javohir01/eater-service/src/domain/address/services"
+	models "github.com/javohir01/eater-service/src/domain/order/models"
 	orderSvc "github.com/javohir01/eater-service/src/domain/order/services"
 )
 
 type OrderApplicationService interface {
-	CreateOrder(
-		ctx context.Context,
-		Instruction,
-		EaterID,
-		RestaurantID,
-		Status,
-		PaymentStatus,
-		OrderItemID,
-		ProductID,
-		Name string,
-		Quantity,
-		Price,
-		TotalPrice int,
-	) (*dtos.SaveOrderResponse, error)
-	UpdateOrder(
-		ctx context.Context,
-		Instruction,
-		EaterID,
-		RestaurantID,
-		Status,
-		PaymentStatus,
-		OrderItemID,
-		ProductID,
-		Name string,
-		Quantity,
-		Price,
-		TotalPrice int,
-	) (*dtos.SaveOrderResponse, error)
-	DeleteOrder(ctx context.Context, orderID string) error
-	GetOrderById(ctx context.Context, orderID string) (*dtos.SaveOrderResponse, error)
-	ListOrderByEaterId(ctx context.Context, eaterID string) ([]*dtos.SaveOrderResponse, error)
+	CreateOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error)
+	UpdateOrder(ctx context.Context, req *pb.UpdateOrderRequest) (*pb.UpdateOrderResponse, error)
+	DeleteOrder(ctx context.Context, req *pb.DeleteOrderRequest) (*pb.DeleteOrderResponse, error)
+	GetOrderById(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error)
+	ListOrderByEaterId(ctx context.Context, req *pb.ListOrderByEaterRequest) (*pb.ListOrderByEaterResponse, error)
 }
 
 type orderAppSvcImpl struct {
-	orderSvc orderSvc.OrderService
+	orderSvc   orderSvc.OrderService
+	addressSvc addressSvc.AddressService
 }
 
 func NewOrderApplicationService(
 	orderSvc orderSvc.OrderService,
+	addressSvc addressSvc.AddressService,
 ) OrderApplicationService {
 	return &orderAppSvcImpl{
-		orderSvc: orderSvc,
+		orderSvc:   orderSvc,
+		addressSvc: addressSvc,
 	}
 }
 
-func (s *orderAppSvcImpl) CreateOrder(
-	ctx context.Context,
-	Instruction,
-	EaterID,
-	RestaurantID,
-	Status,
-	PaymentStatus,
-	OrderItemID,
-	ProductID,
-	Name string,
-	Quantity,
-	Price,
-	TotalPrice int,
-) (*dtos.SaveOrderResponse, error) {
-	if Instruction == "" {
-		return nil, errors.New("Instruction is is required!")
-	}
-	if EaterID == "" {
-		return nil, errors.New("EaterID is is required!")
-	}
-	if RestaurantID == "" {
-		return nil, errors.New("RestaurantID is is required!")
-	}
-	if PaymentStatus == "" {
-		return nil, errors.New("PaymentStatus is is required!")
-	}
-	if OrderItemID == "" {
-		return nil, errors.New("OrderItemID is is required!")
-	}
-	if ProductID == "" {
-		return nil, errors.New("ProductID is is required!")
-	}
-	if Name == "" {
-		return nil, errors.New("Name is is required!")
-	}
-	if Quantity == 0 {
-		return nil, errors.New("Quantity is is required!")
-	}
-	if Price == 0 {
-		return nil, errors.New("Price is is required!")
-	}
-	if TotalPrice == 0 {
-		return nil, errors.New("TotalPrice is is required!")
+func (s *orderAppSvcImpl) CreateOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
+	if err := dtos.ValidateOrderRequestDB(req); err != nil {
+		return nil, err
 	}
 
-	result, err := s.CreateOrder(ctx, Instruction, EaterID, RestaurantID, Status, PaymentStatus, OrderItemID, ProductID, Name, Quantity, Price, TotalPrice)
+	address, err := s.addressSvc.GetAddressById(ctx, req.Cart.Delivery.AddressId)
 	if err != nil {
 		return nil, err
 	}
 
-	return dtos.SaveOrderResponse(result), nil
-}
-
-func (s *orderAppSvcImpl) UpdateOrder(
-	ctx context.Context,
-	Instruction,
-	EaterID,
-	RestaurantID,
-	Status,
-	PaymentStatus,
-	OrderItemID,
-	ProductID,
-	Name string,
-	Quantity,
-	Price,
-	TotalPrice int,
-) (*dtos.SaveOrderResponse, error) {
-	if Instruction == "" {
-		return nil, errors.New("Instruction is is required!")
-	}
-	if EaterID == "" {
-		return nil, errors.New("EaterID is is required!")
-	}
-	if RestaurantID == "" {
-		return nil, errors.New("RestaurantID is is required!")
-	}
-	if PaymentStatus == "" {
-		return nil, errors.New("PaymentStatus is is required!")
-	}
-	if OrderItemID == "" {
-		return nil, errors.New("OrderItemID is is required!")
-	}
-	if ProductID == "" {
-		return nil, errors.New("ProductID is is required!")
-	}
-	if Name == "" {
-		return nil, errors.New("Name is is required!")
-	}
-	if Quantity == 0 {
-		return nil, errors.New("Quantity is is required!")
-	}
-	if Price == 0 {
-		return nil, errors.New("Price is is required!")
-	}
-	if TotalPrice == 0 {
-		return nil, errors.New("TotalPrice is is required!")
+	addressInfo := models.AddressInfo{
+		ID:        address.ID,
+		Name:      address.Name,
+		Longitude: address.Location.Longitude,
+		Latitude:  address.Location.Latitude,
 	}
 
-	result, err := s.UpdateOrder(ctx, Instruction, EaterID, RestaurantID, Status, PaymentStatus, OrderItemID, ProductID, Name, Quantity, Price, TotalPrice)
+	cart := dtos.ToCart(req.GetCart())
+
+	order, err := s.orderSvc.CreateOrder(ctx, req.GetEaterId(), cart, &addressInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	return dtos.SaveOrderResponse(result), nil
+	return &pb.PlaceOrderResponse{
+		Order: dtos.ToOrderPB(order),
+	}, nil
+}
+
+func (s *orderAppSvcImpl) UpdateOrder(ctx context.Context, req *pb.UpdateOrderRequest) (*pb.UpdateOrderResponse, error) {
+	order := dtos.ToOrder(req.GetOrder())
+	if err := s.orderSvc.UpdateOrder(ctx, order); err != nil {
+		return nil, err
+	}
+
+	return &pb.PlaceOrderResponse{
+		Order: ToOrderDb(result),
+	}, nil
 }
 
 func (s *orderAppSvcImpl) DeleteOrder(ctx context.Context, orderID string) error {
-	if orderID == "" {
-		return errors.New("orderID is is required!")
-	}
-
-	err := s.DeleteOrder(ctx, orderID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *orderAppSvcImpl) GetOrderById(ctx context.Context, orderID string) (*dtos.SaveOrderResponse, error) {
-	if orderID == "" {
+	if req.GetOrderId() == "" {
 		return nil, errors.New("orderID is is required!")
 	}
 
-	result, err := s.GetOrderById(ctx, orderID)
+	err := s.orderSvc.DeleteOrder(ctx, req.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
 
-	return dtos.NewSaveOrderResponse(result), nil
+	return &pb.DeleteAddressResponse{}, nil
 }
 
-func (s *orderAppSvcImpl) ListOrderByEaterId(ctx context.Context, eaterID string) ([]*dtos.SaveOrderResponse, error) {
-	if eaterID == "" {
-		return nil, errors.New("eaterID is is required!")
+func (s *orderAppSvcImpl) GetOrderById(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
+	if req.GetOrderId() == "" {
+		return nil, errors.New("orderID is is required!")
 	}
 
-	result, err := s.ListOrderByEaterId(ctx, eaterID)
+	order, err := s.orderSvc.GetOrderById(ctx, req.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
 
-	return dtos.NewSaveOrderResponse(result), nil
+	return &pb.GetOrderResponse{
+		Order: dtos.ToOrderDb(order),
+	}, nil
+}
+
+func (s *orderAppSvcImpl) ListOrderByEaterId(ctx context.Context, req *pb.ListOrderByEaterRequest) (*pb.ListOrderByEaterResponse, error) {
+	if req.GetOrderId() == "" {
+		return nil, errors.New("orderID is is required!")
+	}
+
+	if req.GetSort() == "" {
+		req.Sort = models.SortByCreatedAtDesc //default sort
+	}
+
+	if req.GetPageSize() == 0 {
+		req.PageSize = 15 //default page size
+	}
+
+	orders, err := s.orderSvc.ListOrderByEaterId(ctx, req.GetOrderId(), req.GetSort(), int(req.GetPage()), int(req.GetPageSize()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.ListAddressByEaterIdResponse{
+		Orders: dtos.ToOrdersDb(orders),
+	}, nil
 }
