@@ -1,4 +1,4 @@
-package eaterservice
+package eaterService
 
 func main() {
 
