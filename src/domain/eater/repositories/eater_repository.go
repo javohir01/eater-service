@@ -1,3 +1,11 @@
+package repositories
+
+import (
+	"context"
+
+	"github.com/javohir01/eater-service/src/domain/eater/models"
+)
+
 type EaterRepository interface {
 	WithTx(ctx context.Context, f func(r EaterRepository) error) error
 	SaveEater(ctx context.Context, eater *models.Eater) error

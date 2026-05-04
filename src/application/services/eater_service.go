@@ -6,13 +6,13 @@ import (
 
 	"github.com/javohir01/eater-service/src/application/dtos"
 	eatersvc "github.com/javohir01/eater-service/src/domain/eater/services"
-	"github.com/javohir01/eater-service/src/domain/jwt"
+	"github.com/javohir01/eater-service/src/infrastructure/jwt"
 	"github.com/javohir01/eater-service/src/infrastructure/validator"
 )
 
 type EaterApplicationService interface {
 	SignupEater(ctx context.Context, phoneNumber string) (*dtos.EaterSignupResponse, error)
-	ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*dtos.ConfirmSMSCodeResponse, error)
+	ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*dtos.ConfirmSmsCodeResponse, error)
 	UpdateEaterProfile(ctx context.Context, eaterID, name, imageUrl string) (*dtos.UpdateEaterProfileResponse, error)
 	GetEaterProfile(ctx context.Context, eaterID string) (*dtos.GetEaterProfileResponse, error)
 }
@@ -43,7 +43,7 @@ func (s *eaterAppSvcImpl) SignupEater(ctx context.Context, phoneNumber string) (
 	return dtos.NewEaterSignupResponse(eaterID), nil
 }
 
-func (s *eaterAppSvcImpl) ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*dtos.ConfirmSMSCodeResponse, error) {
+func (s *eaterAppSvcImpl) ConfirmSMSCode(ctx context.Context, eaterID, smsCode string) (*dtos.ConfirmSmsCodeResponse, error) {
 	if eaterID == "" || smsCode == "" {
 		return nil, errors.New("eater ID and SMS code cannot be empty")
 	}
@@ -53,16 +53,16 @@ func (s *eaterAppSvcImpl) ConfirmSMSCode(ctx context.Context, eaterID, smsCode s
 		return nil, err
 	}
 
-	token, err := s.tokenSvc.CreateToken(profile.EaterID)
+	token, err := s.tokenSvc.CreateToken(ctx, profile.EaterID)
 	if err != nil {
 		return nil, err
 	}
 
-	response := dtos.NewConfirmSMSCodeResponse{
+	response := dtos.ConfirmSmsCodeResponse{
 		Profile: profile,
 		Token:   token,
 	}
-	return response, nil
+	return &response, nil
 }
 
 func (s *eaterAppSvcImpl) UpdateEaterProfile(ctx context.Context, eaterID, name, imageUrl string) (*dtos.UpdateEaterProfileResponse, error) {

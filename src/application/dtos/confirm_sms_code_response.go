@@ -6,3 +6,8 @@ type ConfirmSmsCodeResponse struct {
 	Token   string               `json:"token"`
 	Profile *models.EaterProfile `json:"profile"`
 }
+
+type NewConfirmSmsCodeResponse struct {
+	Token   string               `json:"token"`
+	Profile *models.EaterProfile `json:"profile"`
+}

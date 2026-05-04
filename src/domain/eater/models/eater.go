@@ -1,3 +1,7 @@
+package models
+
+import "time"
+
 type Eater struct {
 	ID           string
 	PhoneNumber  string

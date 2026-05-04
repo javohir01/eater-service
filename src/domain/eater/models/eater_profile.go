@@ -1,3 +1,7 @@
+package models
+
+import "time"
+
 type EaterProfile struct {
 	EaterID     string
 	Name        string
