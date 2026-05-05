@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  eater-service:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    container_name: eater-service
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_ENV=production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-eater}
+      - DB_PASSWORD=${DB_PASSWORD:-eater123}
+      - DB_NAME=${DB_NAME:-eater_db}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-3600}
+      - LOG_LEVEL=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - eater-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: eater-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-eater}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eater123}
+      POSTGRES_DB: ${DB_NAME:-eater_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../src/infrastructure/migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - eater-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-eater} -d ${DB_NAME:-eater_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  eater-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
