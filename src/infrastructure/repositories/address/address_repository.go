@@ -38,9 +38,10 @@ func (r *AddressRepoImpl) WithTx(ctx context.Context, f func(r *AddressRepoImpl)
 	return nil
 }
 
-func (r *AddressRepoImpl) CreateAddress(ctx context.Context, name string, longitude, latitude float64) error {
+func (r *AddressRepoImpl) CreateAddress(ctx context.Context, eaterID, name string, longitude, latitude float64) error {
 	address := &models.Address{
 		ID:        rand.String(10),
+		EaterID:   eaterID,
 		Name:      name,
 		Location:  &models.Location{Longitude: longitude, Latitude: latitude},
 		CreatedAt: time.Now(),
@@ -65,4 +66,30 @@ func (r *AddressRepoImpl) UpdateAddress(ctx context.Context, addressID, name str
 		return result.Error
 	}
 	return nil
+}
+
+func (r *AddressRepoImpl) DeleteAddress(ctx context.Context, addressID string) error {
+	result := r.db.WithContext(ctx).Table(TableAddress).Where("id = ?", addressID).Delete(&models.Address{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *AddressRepoImpl) GetAddress(ctx context.Context, addressID string) (*models.Address, error) {
+	var address models.Address
+	result := r.db.WithContext(ctx).Table(TableAddress).First(&address, "id = ?", addressID)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &address, nil
+}
+
+func (r *AddressRepoImpl) GetAddressesByEaterID(ctx context.Context, eaterID string) ([]*models.Address, error) {
+	var addresses []*models.Address
+	result := r.db.WithContext(ctx).Table(TableAddress).Where("eater_id = ?", eaterID).Find(&addresses)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return addresses, nil
 }

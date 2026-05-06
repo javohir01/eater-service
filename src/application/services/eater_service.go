@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/javohir01/eater-service/src/application/dtos"
+	dtos "github.com/javohir01/eater-service/src/application/dtos/eater"
 	eatersvc "github.com/javohir01/eater-service/src/domain/eater/services"
 	"github.com/javohir01/eater-service/src/infrastructure/jwt"
 	"github.com/javohir01/eater-service/src/infrastructure/validator"
