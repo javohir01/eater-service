@@ -1,0 +1,19 @@
+# Database Backups
+backups/
+*.sql
+
+# Docker volumes (local storage)
+postgres_data/
+
+# Logs
+logs/
+
+# Environment (contains sensitive data)
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

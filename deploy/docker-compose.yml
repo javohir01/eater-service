@@ -4,7 +4,7 @@ services:
   eater-service:
     build:
       context: ..
-      dockerfile: deployment/Dockerfile
+      dockerfile: deploy/Dockerfile
     container_name: eater-service
     ports:
       - "8080:8080"
