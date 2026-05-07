@@ -7,7 +7,6 @@ import (
 	"github.com/javohir01/eater-service/src/application/dtos/address"
 	"github.com/javohir01/eater-service/src/domain/address/models"
 	addresssvc "github.com/javohir01/eater-service/src/domain/address/services"
-	"github.com/javohir01/eater-service/src/infrastructure/rand"
 )
 
 type AddressApplicationService interface {
@@ -45,13 +44,12 @@ func (s *addressAppSvcImpl) CreateAddress(ctx context.Context, eaterID string, r
 		return nil, errors.New("longitude and latitude cannot be zero")
 	}
 
-	addressID := rand.String(36)
-	err := s.addressSvc.CreateAddress(ctx, eaterID, req.Name, req.Longitude, req.Latitude)
+	addr, err := s.addressSvc.CreateAddress(ctx, eaterID, req.Name, req.Longitude, req.Latitude)
 	if err != nil {
 		return nil, err
 	}
 
-	return address.NewCreateAddressResponse(addressID), nil
+	return address.NewCreateAddressResponse(addr.ID, addr.Name, addr.Location.Longitude, addr.Location.Latitude), nil
 }
 
 func (s *addressAppSvcImpl) UpdateAddress(ctx context.Context, addressID string, req *address.UpdateAddressRequest) (*address.UpdateAddressResponse, error) {
@@ -71,12 +69,17 @@ func (s *addressAppSvcImpl) UpdateAddress(ctx context.Context, addressID string,
 		return nil, errors.New("longitude and latitude cannot be zero")
 	}
 
-	err := s.addressSvc.UpdateAddress(ctx, addressID, req.Name, req.Longitude, req.Latitude)
+	addr, err := s.addressSvc.UpdateAddress(ctx, addressID, req.Name, req.Longitude, req.Latitude)
 	if err != nil {
 		return nil, err
 	}
 
-	return address.NewUpdateAddressResponse(true), nil
+	return &address.UpdateAddressResponse{
+		AddressID: addr.ID,
+		Name:      addr.Name,
+		Longitude: addr.Location.Longitude,
+		Latitude:  addr.Location.Latitude,
+	}, nil
 }
 
 func (s *addressAppSvcImpl) DeleteAddress(ctx context.Context, addressID string) error {

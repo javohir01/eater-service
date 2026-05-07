@@ -38,7 +38,7 @@ func (r *AddressRepoImpl) WithTx(ctx context.Context, f func(r *AddressRepoImpl)
 	return nil
 }
 
-func (r *AddressRepoImpl) CreateAddress(ctx context.Context, eaterID, name string, longitude, latitude float64) error {
+func (r *AddressRepoImpl) CreateAddress(ctx context.Context, eaterID, name string, longitude, latitude float64) (*models.Address, error) {
 	address := &models.Address{
 		ID:        rand.String(10),
 		EaterID:   eaterID,
@@ -50,12 +50,12 @@ func (r *AddressRepoImpl) CreateAddress(ctx context.Context, eaterID, name strin
 
 	result := r.db.WithContext(ctx).Table(TableAddress).Create(address)
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
-	return nil
+	return address, nil
 }
 
-func (r *AddressRepoImpl) UpdateAddress(ctx context.Context, addressID, name string, longitude, latitude float64) error {
+func (r *AddressRepoImpl) UpdateAddress(ctx context.Context, addressID, name string, longitude, latitude float64) (*models.Address, error) {
 	updateData := map[string]interface{}{
 		"name":       name,
 		"location":   &models.Location{Longitude: longitude, Latitude: latitude},
@@ -63,9 +63,9 @@ func (r *AddressRepoImpl) UpdateAddress(ctx context.Context, addressID, name str
 	}
 	result := r.db.WithContext(ctx).Table(TableAddress).Where("id = ?", addressID).Updates(updateData)
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
-	return nil
+	return r.GetAddress(ctx, addressID)
 }
 
 func (r *AddressRepoImpl) DeleteAddress(ctx context.Context, addressID string) error {
