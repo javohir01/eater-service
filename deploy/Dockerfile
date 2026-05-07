@@ -23,26 +23,26 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -o /app/bin/eater-service /app/main.go
 
 # Runtime stage
-FROM alpine:latest
+FROM debian:bookworm-slim
 
 # Install runtime dependencies
-RUN apk --no-cache add ca-certificates tzdata
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
 # Copy the binary from builder
 COPY --from=builder /app/bin/eater-service .
+RUN chmod +x ./eater-service
 
 # Copy migrations if needed
 COPY --from=builder /app/src/infrastructure/migrations ./migrations
 
 # Expose port
 EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Run the application
 CMD ["./eater-service"]

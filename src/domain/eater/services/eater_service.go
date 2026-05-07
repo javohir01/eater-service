@@ -20,6 +20,7 @@ type EaterService interface {
 	UpdateEaterProfile(ctx context.Context, eaterID, name, imageUrl string) (*models.EaterProfile, error)
 }
 
+
 type eaterSvcImpl struct {
 	eaterRepo repositories.EaterRepository
 	smsClient sms.Client
