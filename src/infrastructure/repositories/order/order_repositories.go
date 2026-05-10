@@ -57,7 +57,7 @@ func (r *OrderRepositoryImpl) UpdatePaymentStatus(ctx context.Context, orderID s
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return r.GetOrderByID(ctx, orderID)
+	return r.GetOrder(ctx, orderID)
 }
 
 func (r *OrderRepositoryImpl) GetOrder(ctx context.Context, id string) (*models.Order, error) {
@@ -69,9 +69,9 @@ func (r *OrderRepositoryImpl) GetOrder(ctx context.Context, id string) (*models.
 	return &order, nil
 }
 
-func (r *OrderRepositoryImpl) GetOrdersByUserID(ctx context.Context, userID string) ([]*models.Order, error) {
+func (r *OrderRepositoryImpl) GetOrderByEaterID(ctx context.Context, eaterID string) ([]*models.Order, error) {
 	var orders []*models.Order
-	result := r.db.WithContext(ctx).Table(TableOrder).Where("user_id = ?", userID).Find(&orders)
+	result := r.db.WithContext(ctx).Table(TableOrder).Where("eater_id = ?", eaterID).Find(&orders)
 	if result.Error != nil {
 		return nil, result.Error
 	}
