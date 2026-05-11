@@ -69,7 +69,7 @@ func (r *OrderRepositoryImpl) GetOrder(ctx context.Context, id string) (*models.
 	return &order, nil
 }
 
-func (r *OrderRepositoryImpl) GetOrderByEaterID(ctx context.Context, eaterID string) ([]*models.Order, error) {
+func (r *OrderRepositoryImpl) GetOrdersByEaterID(ctx context.Context, eaterID string) ([]*models.Order, error) {
 	var orders []*models.Order
 	result := r.db.WithContext(ctx).Table(TableOrder).Where("eater_id = ?", eaterID).Find(&orders)
 	if result.Error != nil {

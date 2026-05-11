@@ -22,8 +22,8 @@ type OrderItem struct {
 	ProductID  string
 	Name       string
 	Quantity   int
-	Price      int
-	TotalPrice int
+	Price      int64
+	TotalPrice int64
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
@@ -49,6 +49,6 @@ type DeliveryInfo struct {
 type PaymentInfo struct {
 	Method        string
 	CardID        string
-	DeliveryPrice int
-	TotalPrice    int
+	DeliveryPrice int64
+	TotalPrice    int64
 }

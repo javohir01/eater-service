@@ -35,8 +35,8 @@ func (s *OrderServiceImpl) GetOrder(ctx context.Context, id string) (*models.Ord
 	return s.repo.GetOrder(ctx, id)
 }
 
-func (s *OrderServiceImpl) GetOrderByEaterID(ctx context.Context, eaterID string) ([]*models.Order, error) {
-	return s.repo.GetOrderByEaterID(ctx, eaterID)
+func (s *OrderServiceImpl) GetOrdersByEaterID(ctx context.Context, eaterID string) ([]*models.Order, error) {
+	return s.repo.GetOrdersByEaterID(ctx, eaterID)
 }
 
 func (s *OrderServiceImpl) DeleteOrder(ctx context.Context, id string) error {
