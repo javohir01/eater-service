@@ -22,11 +22,11 @@ type RatingService interface {
 }	
 
 type RatingServiceImpl struct {
-	restaurantRepository *repositories.RestaurantRatingRepositoryImpl
-	deliveryRepository *repositories.DeliveryRatingRepositoryImpl
+	restaurantRepository repositories.RestaurantRatingRepository
+	deliveryRepository repositories.DeliveryRatingRepository
 }	
 
-func NewRatingService(restaurantRepository *repositories.RestaurantRatingRepositoryImpl, deliveryRepository *repositories.DeliveryRatingRepositoryImpl) *RatingServiceImpl {
+func NewRatingService(restaurantRepository repositories.RestaurantRatingRepository, deliveryRepository repositories.DeliveryRatingRepository) *RatingServiceImpl {
 	return &RatingServiceImpl{restaurantRepository: restaurantRepository, deliveryRepository: deliveryRepository}
 }	
 
