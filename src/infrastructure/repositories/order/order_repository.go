@@ -5,7 +5,7 @@ import (
 
 	"github.com/javohir01/eater-service/src/domain/order/models"
 	"github.com/javohir01/eater-service/src/domain/order/repositories"
-	"github.com/javohir01/eater-service/src/utils/rand"
+	"github.com/javohir01/eater-service/src/infrastructure/rand"
 	"gorm.io/gorm"
 )
 

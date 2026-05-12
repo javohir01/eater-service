@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/javohir01/eater-service/src/domain/rating/models"
-	"github.com/javohir01/eater-service/src/utils/rand"
+	"github.com/javohir01/eater-service/src/infrastructure/rand"
 	"gorm.io/gorm"
 )
 
@@ -38,7 +38,7 @@ func (r *DeliveryRatingRepositoryImpl) UpdateDeliveryRating(ctx context.Context,
 		return nil, result.Error
 	}
 	return deliveryRating, nil
-}	
+}
 
 func (r *DeliveryRatingRepositoryImpl) GetDeliveryRating(ctx context.Context, id string) (*models.DeliveryRating, error) {
 	var deliveryRating models.DeliveryRating
@@ -65,9 +65,9 @@ func (r *DeliveryRatingRepositoryImpl) GetDeliveryRatingsByOrderID(ctx context.C
 		return nil, result.Error
 	}
 	return deliveryRatings, nil
-}	
+}
 
 func (r *DeliveryRatingRepositoryImpl) DeleteDeliveryRating(ctx context.Context, id string) error {
 	result := r.db.WithContext(ctx).Table(TableDeliveryRating).Where("id = ?", id).Delete(&models.DeliveryRating{})
 	return result.Error
-}		
+}

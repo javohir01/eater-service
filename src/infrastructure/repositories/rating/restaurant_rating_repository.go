@@ -1,11 +1,11 @@
-package repositories
+package rating
 
 import (
 	"context"
 	"time"
 
 	"github.com/javohir01/eater-service/src/domain/rating/models"
-	"github.com/javohir01/eater-service/src/utils/rand"
+	"github.com/javohir01/eater-service/src/infrastructure/rand"
 	"gorm.io/gorm"
 )
 
@@ -38,7 +38,7 @@ func (r *RestaurantRatingRepositoryImpl) UpdateRestaurantRating(ctx context.Cont
 		return nil, result.Error
 	}
 	return restaurantRating, nil
-}	
+}
 
 func (r *RestaurantRatingRepositoryImpl) GetRestaurantRating(ctx context.Context, id string) (*models.RestaurantRating, error) {
 	var restaurantRating models.RestaurantRating
@@ -65,9 +65,9 @@ func (r *RestaurantRatingRepositoryImpl) GetRestaurantRatingsByRestaurantID(ctx 
 		return nil, result.Error
 	}
 	return restaurantRatings, nil
-}	
+}
 
 func (r *RestaurantRatingRepositoryImpl) DeleteRestaurantRating(ctx context.Context, id string) error {
 	result := r.db.WithContext(ctx).Table(TableRestaurantRating).Where("id = ?", id).Delete(&models.RestaurantRating{})
 	return result.Error
-}	
+}

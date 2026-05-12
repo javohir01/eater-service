@@ -1,5 +1,7 @@
 package rating
 
+import "time"
+
 type RestaurantRatingResponse struct {
 	ID           string    `json:"id"`
 	EaterID      string    `json:"eater_id"`

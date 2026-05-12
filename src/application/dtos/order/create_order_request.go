@@ -1,7 +1,5 @@
 package order
 
-import "github.com/javohir01/eater-service/src/domain/order/models"
-
 type CreateOrderRequest struct {
 	EaterID         string            `json:"eater_id" binding:"required"`
 	Instruction     string            `json:"instruction"`
